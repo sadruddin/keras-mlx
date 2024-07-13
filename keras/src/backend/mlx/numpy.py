@@ -467,7 +467,8 @@ def identity(n, dtype=None):
 
 
 def imag(x):
-    raise NotImplementedError("MLX doesn't support imag yet")
+    x = convert_to_tensor(x)
+    return (-1j*x).astype(mx.float32)
 
 
 def isclose(x1, x2):

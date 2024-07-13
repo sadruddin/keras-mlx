@@ -3594,7 +3594,7 @@ class NumpyOneInputOpsCorrectnessTest(testing.TestCase, parameterized.TestCase):
         self.assertAllClose(knp.Hstack()([x, y]), np.hstack([x, y]))
 
     def test_imag(self):
-        x = np.array([[1 + 1j, 2 + 2j, 3 + 3j], [3 + 3j, 2 + 2j, 1 + 1j]])
+        x = np.array([[1 + 1.5j, 2 + 2.5j, 3 + 3.5j], [3 + 3.5j, 2 + 2.5j, 1 + 1.5j]])
         self.assertAllClose(knp.imag(x), np.imag(x))
         self.assertAllClose(knp.Imag()(x), np.imag(x))
 
