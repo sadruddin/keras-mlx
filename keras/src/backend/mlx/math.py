@@ -2,7 +2,34 @@ import math
 
 import mlx.core as mx
 
-from keras.src.backend.mlx.core import convert_to_tensor
+from keras.src.backend.mlx.core import convert_to_tensor, to_mlx_dtype
+
+def _get_complex_tensor_from_tuple(x):
+    if not isinstance(x, (tuple, list)) or len(x) != 2:
+        raise ValueError(
+            "Input `x` should be a tuple of two tensors - real and imaginary."
+            f"Received: x={x}"
+        )
+    # `convert_to_tensor` does not support passing complex tensors. We separate
+    # the input out into real and imaginary and convert them separately.
+    real, imag = x
+    # Check shapes.
+    if real.shape != imag.shape:
+        raise ValueError(
+            "Input `x` should be a tuple of two tensors - real and imaginary."
+            "Both the real and imaginary parts should have the same shape. "
+            f"Received: x[0].shape = {real.shape}, x[1].shape = {imag.shape}"
+        )
+    # Ensure dtype is float.
+    if not mx.issubdtype(to_mlx_dtype(real.dtype), mx.floating) or not mx.issubdtype(
+        to_mlx_dtype(imag.dtype), mx.floating
+    ):
+        raise ValueError(
+            "At least one tensor in input `x` is not of type float."
+            f"Received: x={x}."
+        )
+    complex_input = mx.array(real + imag*1j, dtype=mx.complex64)
+    return complex_input
 
 
 def segment_sum(data, segment_ids, num_segments=None, sorted=False):
@@ -55,23 +82,25 @@ def extract_sequences(x, sequence_length, sequence_stride):
 
 
 def fft(x):
-    # TODO: https://ml-explore.github.io/mlx/build/html/python/fft.html#fft
-    raise NotImplementedError("fft not yet implemented in mlx")
+    x = _get_complex_tensor_from_tuple(x)
+    result = mx.fft.fft(x)
+    return [result.astype(mx.float32), (-1j*result).astype(mx.float32)]
 
 
 def fft2(x):
-    # TODO: https://ml-explore.github.io/mlx/build/html/python/fft.html#fft
-    raise NotImplementedError("fft not yet implemented in mlx")
+    x = _get_complex_tensor_from_tuple(x)
+    result = mx.fft.fft2(x)
+    return [result.astype(mx.float32), (-1j*result).astype(mx.float32)]
 
 
 def rfft(x, fft_length=None):
-    # TODO: https://ml-explore.github.io/mlx/build/html/python/fft.html#fft
-    raise NotImplementedError("fft not yet implemented in mlx")
-
+    x = convert_to_tensor(x)
+    result = mx.fft.rfft(x, fft_length)
+    return [result.astype(mx.float32), (-1j*result).astype(mx.float32)]
 
 def irfft(x, fft_length=None):
-    # TODO: https://ml-explore.github.io/mlx/build/html/python/fft.html#fft
-    raise NotImplementedError("fft not yet implemented in mlx")
+    x = _get_complex_tensor_from_tuple(x)
+    return mx.fft.irfft(x, fft_length)
 
 
 def stft(

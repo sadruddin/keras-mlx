@@ -622,8 +622,8 @@ class MathOpsCorrectnessTest(testing.TestCase, parameterized.TestCase):
         self.assertAllClose(output, expected)
 
     def test_fft(self):
-        real = np.random.random((2, 4, 3))
-        imag = np.random.random((2, 4, 3))
+        real = np.random.random((2, 4, 3)).astype('float32')
+        imag = np.random.random((2, 4, 3)).astype('float32')
         complex_arr = real + 1j * imag
 
         real_output, imag_output = kmath.fft((real, imag))
@@ -634,8 +634,8 @@ class MathOpsCorrectnessTest(testing.TestCase, parameterized.TestCase):
         self.assertAllClose(imag_ref, imag_output)
 
     def test_fft2(self):
-        real = np.random.random((2, 4, 3))
-        imag = np.random.random((2, 4, 3))
+        real = np.random.random((2, 4, 3)).astype('float32')
+        imag = np.random.random((2, 4, 3)).astype('float32')
         complex_arr = real + 1j * imag
 
         real_output, imag_output = kmath.fft2((real, imag))
@@ -668,16 +668,16 @@ class MathOpsCorrectnessTest(testing.TestCase, parameterized.TestCase):
     @parameterized.parameters([(None,), (3,), (15,)])
     def test_irfft(self, n):
         # Test 1D.
-        real = np.random.random((10,))
-        imag = np.random.random((10,))
+        real = np.random.random((10,)).astype('float32')
+        imag = np.random.random((10,)).astype('float32')
         complex_arr = real + 1j * imag
         output = kmath.irfft((real, imag), fft_length=n)
         ref = np.fft.irfft(complex_arr, n=n)
         self.assertAllClose(output, ref, atol=1e-5, rtol=1e-5)
 
         # Test N-D case.
-        real = np.random.random((2, 3, 10))
-        imag = np.random.random((2, 3, 10))
+        real = np.random.random((2, 3, 10)).astype('float32')
+        imag = np.random.random((2, 3, 10)).astype('float32')
         complex_arr = real + 1j * imag
         output = kmath.irfft((real, imag), fft_length=n)
         ref = np.fft.irfft(complex_arr, n=n)
